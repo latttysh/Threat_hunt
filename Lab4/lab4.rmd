@@ -1,0 +1,204 @@
+---
+title: "Основы обработки данных с помощью R"
+author: "Латыш С.А."
+date: "2022-12-01"
+output: html_document
+---
+
+## Цель работы
+1. Зекрепить практические навыки использования языка программирования R для обработки данных
+2. Закрепить знания основных функций обработки данных экосистемы tidyverse языка R
+3. Развить пркатические навыки использования функций обработки данных пакета dplyr – функции select(), filter(), mutate(), arrange(), group_by()
+
+
+```{r}
+library(nycflights13)
+library(dplyr)
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Основы обработки данных с помощью R
+Практическое задание #4
+
+## Цель работы
+1. Закрепить практические навыки использования языка программирования R для обработки данных
+2. Закрепить знания базовых типов данных языка R
+3. Развить практические навыки использования функция обработки данных пакета dplyre - функций select(), filter(), mutate(), arrange(), group_by()
+
+## Задание
+Проанализировать встроенный в пакет nycflights13 наборы данных с помощью языа R и ответить на вопросы:
+
+```{r message=FALSE, warning=FALSE}
+install.packages("tidyverse")
+library(dplyr)
+library(nycflights13)
+```
+
+
+1) Сколько встроенных в пакет nycflights13 датафреймов?
+```{r}
+num_DFs <- ls("package:nycflights13")
+length(num_DFs)
+```
+Ответ: 5
+
+2) Сколько строк в каждом датафрейме?
+Ответ:
+```{r}
+num_DFs[1]
+col_airlines <- nrow(airlines)
+col_airlines
+
+num_DFs[2]
+col_airports <- nrow(airports)
+col_airports
+
+num_DFs[3]
+col_flights <- nrow(flights)
+col_flights
+
+num_DFs[4]
+col_planes <- nrow(planes)
+col_planes
+
+num_DFs[5]
+col_weather <- nrow(weather)
+col_weather
+```
+
+3) Сколько столбцов в каждом датафрейме?
+Ответ:
+```{r}
+num_DFs[1]
+col_airlines <- ncol(airlines)
+col_airlines
+
+num_DFs[2]
+col_airports <- ncol(airports)
+col_airports
+
+num_DFs[3]
+col_flights <- ncol(flights)
+col_flights
+
+num_DFs[4]
+col_planes <- ncol(planes)
+col_planes
+
+num_DFs[5]
+col_weather <- ncol(weather)
+col_weather
+```
+
+4) Как просмотреть примерный вид датафрейма?
+```{r}
+glimpse(airlines)
+glimpse(airports)
+```
+
+5) Сколько компаний-перевозчиков (carrier) учитывают эти наборы данных (представлено в наборах данных)?
+```{r}
+airlines %>% nrow()
+```
+
+6) Сколько рейсов принял аэропорт John F Kennedy Intl в мае?
+```{r}
+num_of_flights <- count(filter(flights,origin=='JFK', month == 5))
+num_of_flights
+```
+Ответ: 9397
+
+7. Какой самый северный аэропорт?
+```{r}
+sever <- max(airports$lat)
+airports %>% filter(lat == sever)
+```
+
+8. Какой аэропорт самый высокогорный?
+```{r}
+visokiy <- max(airports$alt)
+airports %>% filter(alt == visokiy)
+```
+
+9. Какие бортовые номера у самых старых самолётов?
+```{r}
+planes %>% 
+  filter(year == min(year,na.rm = TRUE)) %>% select (tailnum)
+
+```
+
+10. Какая средняя температура воздуха была в сентябре в аэропорту John F Kennedy Intl (в градусах Цельсия).
+```{r}
+weather %>% filter(origin == "JFK",month == 9) %>% summarise(avg_temp = mean(5/9*(temp - 32), na.rm=TRUE))
+```
+
+11. Самолеты какой авиакомпании совершили больше всего вылетов в июне?
+```{r}
+carr <- flights %>% filter(month == 6) %>%
+  group_by(carrier) %>% 
+  summarise(n_flights=n()) %>% 
+  arrange(desc(n_flights)) %>%
+  head(1) %>%
+  select(carrier) %>% paste(sep='')
+airlines %>% filter(carrier == carr)
+```
+
+12.Самолеты какой авиакомпании задерживались чаще других в 2013 году?
+```{r}
+flights.2013 <- flights %>% 
+  filter(year == 2013) %>%
+  filter(dep_delay>0) %>%
+  group_by(carrier) %>% 
+  summarise(N = n())
+airlines %>% filter(carrier == carr)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

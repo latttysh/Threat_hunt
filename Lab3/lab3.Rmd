@@ -1,0 +1,105 @@
+---
+title: "lab3"
+author: "Латыш С.А."
+output: html_document
+date: "2022-12-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Основы обработки данных с помощью R
+
+## Цель работы
+1. Развить практические навыки использования языка программирования R для обработки данных
+2. Закрепить знания базовых типов данных языка R
+3. Развить практические навыки использования функция обработки данных пакета dplyre - функций select(), filter(), mutate(), arrange(), group_by()
+
+## Задание
+Проанализировать встроенный пакет dplyr набор данных starwars с помощью языа R и ответить на вопросы:
+
+1) Сколько строк в датафрейме?
+
+```{r message=FALSE, warning=FALSE}
+install.packages("tidyverse")
+```
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+```
+
+```{r}
+starwars <- starwars
+starwars %>% nrow()
+```
+Ответ: 87 rows
+
+2) Cколько столбцов в датафрейме?
+```{r}
+starwars %>% ncol()
+```
+Ответ: 14
+
+3) Как просмотреть примерный вид датафрейма?
+```{r}
+starwars %>% glimpse()
+```
+
+4) Сколько уникальных рас персонажей(species) представлено в данных?
+```{r}
+unique(starwars['species'], incomparables = FALSE)
+```
+Ответ: 38, включая NA.
+
+5)Найти самого высокого персонажа
+```{r paged.print=TRUE}
+starwars['height'][is.na(starwars['height'])] <- 0
+starwarsDF <- as.data.frame(dplyr::starwars) %>% dplyr::filter(height == max(starwars['height']))
+starwarsDF$name
+```
+Ответ: Yarael Poof
+
+6) Найти всех персонажей ниже 170
+Ответ:
+```{r}
+starwars_lo <- as.data.frame(dplyr::starwars) %>% dplyr::filter(height < 170)
+starwars_lo$name
+```
+
+7) Подсчитать ИМТ(индекс массы тела) для всех персонажей. Формула: i = масса / рост^2
+Ответ:
+```{r}
+starwars %>%
+  mutate(name, imt = mass/((height/100)^2))%>%
+  select(name, imt)
+```
+
+8) Найти 10 самых “вытянутых” персонажей. “Вытянутость” оценить по отношению массы (mass) к росту (height) персонажей
+Ответ:
+```{r}
+elongated <- starwars %>% group_by(name)  %>% summarise(elong=mass/height)
+head(arrange(elongated, desc(elong)), 10)
+```
+
+9) Найти средний возраст персонажей каждой расы вселенной Звездных войн
+Ответ:
+```{r}
+starwars %>% 
+  filter(!is.na(birth_year)) %>% filter(!is.na(species)) %>%
+  group_by(species)  %>% summarise(mean_age= mean(birth_year))
+```
+
+10) Найти самый распространенный цвет глаз персонажей вселенной Звездных войн
+```{r}
+newDF <- starwars %>% group_by(eye_color) %>% summarise(count=n())
+head(arrange(newDF, desc(count)), 1)
+```
+Ответ: brown
+
+11) Подсчитать среднюю длину имени в каждой расе вселенной Звездных войн
+
+Ответ:
+```{r}
+mean_name_DF <- starwars %>% filter(!is.na(species)) %>% group_by(species)  %>% summarise(mean_lenght=mean(nchar(name)))
+mean_name_DF
+```
